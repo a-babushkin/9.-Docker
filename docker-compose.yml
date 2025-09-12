@@ -24,13 +24,17 @@ services:
       - postgres_data:/var/lib/postgresql/data
     env_file:
       - ./.env
+    ports:
+      - "5432:5432"
 
   redis:
       image: redis:alpine
+      ports:
+        - "6379:6379"
 
   celery:
     build: .
-    command: sh -c "poetry run celery -A your_django_app worker --loglevel=info"
+    command: sh -c "poetry run celery -A drf-app worker --loglevel=info"
     depends_on:
       - redis
       - web
@@ -39,7 +43,7 @@ services:
 
   celery-beat:
     build: .
-    command: sh -c "poetry run celery -A your_django_app beat --loglevel=info"
+    command: sh -c "poetry run celery -A drf-app beat --loglevel=info"
     depends_on:
       - redis
       - web

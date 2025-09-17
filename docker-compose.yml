@@ -7,6 +7,7 @@ services:
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
+      - ./logs:/app/logs
     ports:
       - "8000"
     depends_on:
@@ -28,6 +29,10 @@ services:
 
   db:
     image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 260439
+      POSTGRES_DB: db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
@@ -42,7 +47,7 @@ services:
 
   celery:
     build: .
-    command: sh -c "poetry run celery -A drf-app worker --loglevel=info"
+    command: sh -c "poetry run celery -A celery_app worker --loglevel=info"
     depends_on:
       - redis
       - web
@@ -51,7 +56,7 @@ services:
 
   celery-beat:
     build: .
-    command: sh -c "poetry run celery -A drf-app beat --loglevel=info"
+    command: sh -c "poetry run celery -A celery_app beat --loglevel=info"
     depends_on:
       - redis
       - web

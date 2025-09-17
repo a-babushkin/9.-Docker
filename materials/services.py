@@ -1,5 +1,5 @@
-import logging
-import os
+# import logging
+# import os
 from datetime import datetime, timedelta, timezone
 
 from django.core.mail import send_mail
@@ -8,17 +8,17 @@ from config import settings
 from materials.models import Course, Subscription
 from users.models import User
 
-logger = logging.getLogger(__name__)
-
-log_dir = '/app/logs'
-os.makedirs(log_dir, exist_ok=True)
-log_file_path = os.path.join(log_dir, 'mailing_send.log')
-
-file_handler = logging.FileHandler(log_file_path, encoding="utf-8")
-formatter = logging.Formatter("%(asctime)s [%(levelname)s]: %(message)s")
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-logger.setLevel(logging.INFO)
+# logger = logging.getLogger(__name__)
+#
+# log_dir = '/app/logs'
+# os.makedirs(log_dir, exist_ok=True)
+# log_file_path = os.path.join(log_dir, 'mailing_send.log')
+#
+# file_handler = logging.FileHandler(log_file_path, encoding="utf-8")
+# formatter = logging.Formatter("%(asctime)s [%(levelname)s]: %(message)s")
+# file_handler.setFormatter(formatter)
+# logger.addHandler(file_handler)
+# logger.setLevel(logging.INFO)
 
 
 def send_update_course(pk):
@@ -32,18 +32,18 @@ def send_update_course(pk):
 
     for subscription in course_subscriptions:
         if not subscription.user.email:
-            logger.warning(
-                f"У получателя {subscription} отсутствует действительный адрес электронной почты."
-            )
+            # logger.warning(
+            #     f"У получателя {subscription} отсутствует действительный адрес электронной почты."
+            # )
             break
         try:
             send_mail(subject, message, from_email, [subscription.user.email])
-            logger.info(
-                f"На почту: {subscription.user.email} отправлено письмо про обновление курса: {course_title}."
-            )
+            # logger.info(
+            #     f"На почту: {subscription.user.email} отправлено письмо про обновление курса: {course_title}."
+            # )
 
         except Exception as e:
-            logger.error(f"Ошибка отправки: {e}")
+            print(f"Ошибка отправки: {e}")
 
 
 def check_last_login_and_block():

@@ -3,15 +3,17 @@ import os
 from datetime import datetime, timedelta, timezone
 
 from django.core.mail import send_mail
-# from django.utils import timezone
 
 from config import settings
 from materials.models import Course, Subscription
 from users.models import User
 
 logger = logging.getLogger(__name__)
-log_file_path = '/app/logs/mailing_send.log'
-# log_file_path = os.path.join(settings.BASE_DIR, "logs", "mailing_send.log")
+
+log_dir = '/app/logs'
+os.makedirs(log_dir, exist_ok=True)
+log_file_path = os.path.join(log_dir, 'mailing_send.log')
+
 file_handler = logging.FileHandler(log_file_path, encoding="utf-8")
 formatter = logging.Formatter("%(asctime)s [%(levelname)s]: %(message)s")
 file_handler.setFormatter(formatter)

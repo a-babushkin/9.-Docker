@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+  web:
+    build: .
+    command: sh -c "poetry run python manage.py migrate && poetry run python manage.py csu && poetry run python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+      - static_volume:/app/staticfiles
+    ports:
+      - "8000"
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - ./.env
+
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/app/staticfiles
+    depends_on:
+      - web
+
+  db:
+    image: postgres:17
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+
+  redis:
+      image: redis:7
+      volumes:
+        - redis_data:/data
+      env_file:
+        - ./.env
+
+  celery:
+    build: .
+    command: sh -c "poetry run celery -A drf-app worker --loglevel=info"
+    depends_on:
+      - redis
+      - web
+    env_file:
+      - .env
+
+  celery-beat:
+    build: .
+    command: sh -c "poetry run celery -A drf-app beat --loglevel=info"
+    depends_on:
+      - redis
+      - web
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
+  static_volume:
+  redis_data:

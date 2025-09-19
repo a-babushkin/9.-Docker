@@ -15,7 +15,7 @@ RUN poetry install --no-root
 COPY . .
 
 RUN mkdir -p /app/media
-RUN mkdir -p /app/static
+COPY static /app/static
 
 EXPOSE 8000
 

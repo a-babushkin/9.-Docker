@@ -1,11 +1,10 @@
 services:
   web:
     build: .
-    command: sh -c "poetry run python manage.py migrate && poetry run python manage.py csu && poetry run python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "poetry run python manage.py migrate && poetry run python manage.py csu && python manage.py collectstatic --noinput && poetry run gunicorn config.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
-      - ./logs:/app/logs
     ports:
       - "8000"
     depends_on:
@@ -30,7 +29,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 260439
-      POSTGRES_DB: db
+      POSTGRES_DB: drf
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
@@ -45,7 +44,7 @@ services:
 
   celery:
     build: .
-    command: sh -c "poetry run celery -A app worker --loglevel=info"
+    command: sh -c "poetry run celery -A config.celery worker --loglevel=info"
     depends_on:
       - redis
       - web
@@ -54,7 +53,7 @@ services:
 
   celery-beat:
     build: .
-    command: sh -c "poetry run celery -A app beat --loglevel=info"
+    command: sh -c "poetry run celery -A config.celery beat --loglevel=info"
     depends_on:
       - redis
       - web
